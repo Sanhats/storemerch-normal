@@ -7,13 +7,17 @@ import { ProductList } from "@/components/product-list"
 import { Button } from "@/components/ui/button"
 import type { Product } from "@/types"
 
-interface CategoryPageProps {
+interface PageProps {
   params: {
-    categoryId: string
-  }
+    categoryId: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: PageProps) {
   const cookieStore = cookies()
   const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
