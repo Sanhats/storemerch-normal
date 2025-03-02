@@ -15,7 +15,7 @@ const routes = [
     label: 'Categories',
   },
   {
-    href: '/products',
+    href: '/product',
     label: 'Products',
   }
 ]

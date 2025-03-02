@@ -15,11 +15,16 @@ export function ProductCard({ data }: ProductCardProps) {
   const router = useRouter()
 
   const handleClick = () => {
-    router.push(`/products/${data.id}`)
+    router.push(`/product/${data.id}`)  // Asegúrate de que esta ruta coincida
+  }
+
+  const onAddToCart = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    // TODO: Implementar funcionalidad del carrito
   }
 
   return (
-    <div className="group cursor-pointer space-y-4">
+    <div onClick={handleClick} className="group cursor-pointer space-y-4">
       <div className="aspect-square rounded-lg bg-gray-100 relative">
         <Image 
           src={data.images?.[0]?.url || ''} 
@@ -30,14 +35,17 @@ export function ProductCard({ data }: ProductCardProps) {
         <div className="opacity-0 group-hover:opacity-100 transition absolute w-full px-6 bottom-5">
           <div className="flex gap-x-6 justify-center">
             <Button
-              onClick={handleClick}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleClick()
+              }}
               variant="secondary"
               size="icon"
             >
               <Expand size={20} className="text-gray-600" />
             </Button>
             <Button
-              onClick={() => {}}
+              onClick={onAddToCart}
               variant="secondary"
               size="icon"
             >

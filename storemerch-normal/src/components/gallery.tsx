@@ -6,7 +6,7 @@ import { Tab } from "@headlessui/react"
 import { cn } from "@/lib/utils"
 import { ProductImage } from "@/types"
 
-interface GalleryProps {
+export interface GalleryProps {
   images: ProductImage[];
 }
 
