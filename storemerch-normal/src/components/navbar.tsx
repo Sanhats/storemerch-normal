@@ -1,10 +1,10 @@
 'use client'
 
 import Link from "next/link"
-import { ShoppingCart, User } from 'lucide-react'
+import {  User } from 'lucide-react'
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-
+import { CartSheet } from "@/components/ui/cart-sheet"
 const routes = [
   {
     href: '/',
@@ -45,11 +45,7 @@ export function Navbar() {
           ))}
         </nav>
         <div className="ml-auto flex items-center space-x-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/cart">
-              <ShoppingCart className="h-5 w-5" />
-            </Link>
-          </Button>
+        <CartSheet />
           <Button variant="ghost" size="icon" asChild>
             <Link href="/profile">
               <User className="h-5 w-5" />

@@ -14,23 +14,28 @@ export interface Color {
 }
 
 export interface ProductImage {
-  id: string;
-  url: string;
-  color: Color;
+  id: string
+  url: string
+  color?: {
+    name: string
+    hex: string
+  }
 }
 
 export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category_id: string;
-  featured: boolean;
-  images: ProductImage[];
-  category?: Category;
-  created_at?: string;
+  id: string
+  category: string
+  name: string
+  price: string
+  isFeatured: boolean
+  size: string
+  color: string
+  images: ProductImage[]
+  description: string
+  stock: number
 }
+
+
 
 export interface CartItem extends Product {
   quantity: number;
