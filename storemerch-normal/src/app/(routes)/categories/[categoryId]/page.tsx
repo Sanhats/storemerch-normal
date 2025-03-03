@@ -9,21 +9,17 @@ import { Button } from "@/components/ui/button"
 import { Container } from "@/components/ui/container"
 import type { Product } from "@/types"
 
-// Definimos los tipos correctamente para Next.js 15
-type PageProps = {
-  params: {
-    categoryId: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
+// Eliminamos la definición personalizada de PageProps
 
 export default async function CategoryPage({
   params,
   searchParams,
-}: PageProps) {
+}: {
+  params: { categoryId: string };
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
   try {
-    // Obtenemos directamente el categoryId
-    const categoryId = params.categoryId
+    const categoryId = params.categoryId;
 
     // Obtenemos las cookies de forma asíncrona
     const cookieStore = cookies()
