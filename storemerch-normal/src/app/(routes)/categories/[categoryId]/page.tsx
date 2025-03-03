@@ -11,9 +11,9 @@ import type { Product } from "@/types"
 
 // Definimos los tipos correctamente para Next.js 15
 type PageProps = {
-  params: Promise<{
+  params: {
     categoryId: string;
-  }>;
+  };
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
@@ -22,9 +22,8 @@ export default async function CategoryPage({
   searchParams,
 }: PageProps) {
   try {
-    // Esperamos a que se resuelvan los parámetros
-    const resolvedParams = await params
-    const categoryId = resolvedParams.categoryId
+    // Obtenemos directamente el categoryId
+    const categoryId = params.categoryId
 
     // Obtenemos las cookies de forma asíncrona
     const cookieStore = cookies()
