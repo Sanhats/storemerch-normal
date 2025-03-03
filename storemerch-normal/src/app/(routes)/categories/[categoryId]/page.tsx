@@ -18,9 +18,12 @@ type PageProps = {
 }
 
 export default async function CategoryPage({
-  params,
-  searchParams,
-}: PageProps) {
+  params, 
+  searchParams 
+}: { 
+  params: { categoryId: string },
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
   try {
     // Esperamos a que se resuelvan los parámetros
     const resolvedParams = await params
