@@ -2,7 +2,8 @@
 
 import Image from "next/image"
 import { Tab } from "@headlessui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
+import { ZoomIn, ZoomOut, Move } from 'lucide-react'
 
 import { cn } from "@/lib/utils"
 import type { ProductImage } from "@/types"
@@ -15,6 +16,8 @@ export interface GalleryProps {
 export function Gallery({ images = [], selectedColor }: GalleryProps) {
   const [filteredImages, setFilteredImages] = useState<ProductImage[]>(images)
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [isZoomed, setIsZoomed] = useState(false)
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     if (selectedColor) {
@@ -26,6 +29,21 @@ export function Gallery({ images = [], selectedColor }: GalleryProps) {
     }
   }, [selectedColor, images])
 
+  const handleZoom = useCallback(() => {
+    setIsZoomed((prev) => !prev)
+    setZoomPosition({ x: 0, y: 0 })
+  }, [])
+
+  const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    if (!isZoomed) return
+
+    const { left, top, width, height } = event.currentTarget.getBoundingClientRect()
+    const x = (event.clientX - left) / width
+    const y = (event.clientY - top) / height
+
+    setZoomPosition({ x: x * 100, y: y * 100 })
+  }, [isZoomed])
+
   return (
     <Tab.Group as="div" className="flex flex-col-reverse" selectedIndex={selectedIndex} onChange={setSelectedIndex}>
       <div className="mx-auto mt-6 hidden w-full max-w-2xl sm:block lg:max-w-none">
@@ -36,16 +54,14 @@ export function Gallery({ images = [], selectedColor }: GalleryProps) {
               className="relative flex aspect-square cursor-pointer items-center justify-center rounded-md bg-white group"
             >
               {({ selected }) => (
-                <div className="relative w-full h-full">
-                  <span className="absolute h-full w-full aspect-square inset-0 overflow-hidden rounded-md">
-                    <Image
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      src={image.url || "/placeholder.svg"}
-                      alt=""
-                      className="object-cover object-center"
-                    />
-                  </span>
+                <div className="relative w-full h-full overflow-hidden rounded-md">
+                  <Image
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    src={image.url || "/placeholder.svg"}
+                    alt=""
+                    className="object-cover object-center transition-transform duration-300 group-hover:scale-110"
+                  />
                   <span
                     className={cn(
                       "absolute inset-0 rounded-md ring-2 ring-offset-2",
@@ -71,17 +87,47 @@ export function Gallery({ images = [], selectedColor }: GalleryProps) {
       <Tab.Panels className="aspect-square w-full">
         {filteredImages.map((image, index) => (
           <Tab.Panel key={image.id}>
-            <div className="aspect-square relative h-full w-full sm:rounded-lg overflow-hidden group">
+            <div 
+              className={cn(
+                "aspect-square relative h-full w-full sm:rounded-lg overflow-hidden group cursor-zoom-in",
+                isZoomed && "cursor-zoom-out"
+              )}
+              onClick={handleZoom}
+              onMouseMove={handleMouseMove}
+            >
               <Image
                 fill
                 priority={index === 0}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 src={image.url || "/placeholder.svg"}
                 alt="Product image"
-                className="object-cover object-center"
+                className={cn(
+                  "object-cover object-center transition-transform duration-300",
+                  isZoomed && "scale-150"
+                )}
+                style={isZoomed ? {
+                  transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`
+                } : undefined}
               />
+              {/* Zoom controls */}
+              <div className="absolute top-4 right-4 flex items-center gap-2 bg-white/90 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={(e) => { e.stopPropagation(); handleZoom(); }}
+                  className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                  aria-label={isZoomed ? "Zoom out" : "Zoom in"}
+                >
+                  {isZoomed ? <ZoomOut size={20} /> : <ZoomIn size={20} />}
+                </button>
+              </div>
+              {/* Zoom indicator */}
+              {isZoomed && (
+                <div className="absolute bottom-4 left-4 bg-white/90 rounded-full p-2 flex items-center gap-2">
+                  <Move size={20} />
+                  <span className="text-sm font-medium">Move to zoom</span>
+                </div>
+              )}
               {/* Color indicator for main image */}
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-4 right-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="bg-white/90 px-3 py-2 rounded-full text-sm font-medium shadow-sm flex items-center gap-2">
                   <div
                     className="w-4 h-4 rounded-full border border-gray-200"
@@ -97,4 +143,3 @@ export function Gallery({ images = [], selectedColor }: GalleryProps) {
     </Tab.Group>
   )
 }
-
