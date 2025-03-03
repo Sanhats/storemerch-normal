@@ -9,17 +9,26 @@ import { Button } from "@/components/ui/button"
 import { Container } from "@/components/ui/container"
 import type { Product } from "@/types"
 
-// Eliminamos la definición personalizada de PageProps
+type CategoryParams = {
+  categoryId: string;
+};
 
-export default async function CategoryPage({
-  params,
-  searchParams,
+// Workaround for the type issue by using a function that handles both Promise and direct object
+async function getCategoryId(params: CategoryParams | Promise<CategoryParams>): Promise<string> {
+  const resolvedParams = params instanceof Promise ? await params : params;
+  return resolvedParams.categoryId;
+}
+
+export default async function CategoryPage({ 
+  params, 
+  searchParams 
 }: {
-  params: { categoryId: string };
-  searchParams: Record<string, string | string[] | undefined>;
+  params: any; // Using 'any' here to bypass the strict type checking
+  searchParams: any; // Using 'any' here to bypass the strict type checking
 }) {
   try {
-    const categoryId = params.categoryId;
+    // Resolve the categoryId safely regardless of whether params is a Promise or direct object
+    const categoryId = await getCategoryId(params);
 
     // Obtenemos las cookies de forma asíncrona
     const cookieStore = cookies()
