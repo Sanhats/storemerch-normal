@@ -1,42 +1,31 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import Link from "next/link"
-import { ArrowLeft } from 'lucide-react'
-import { notFound } from "next/navigation"
 
-import { Gallery } from "@/components/gallery"
-import { ProductInfo } from "@/components/product-info"
+import { ProductCard } from "@/components/product-card"
 import { Container } from "@/components/ui/container"
-import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
+import type { Product } from "@/types"
 
+// Actualizado el tipo PageProps para Next.js 15
 type PageProps = {
-  params: Promise<{
-    productId: string;
-  }>;
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{}>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function ProductPage({
+export default async function ProductsPage({
   params,
   searchParams,
 }: PageProps) {
   try {
-    // Esperamos a que se resuelvan los parámetros
-    const resolvedParams = await params
-    const productId = resolvedParams.productId
-
-    if (!productId) {
-      notFound()
-    }
-
+    // Obtenemos las cookies de forma asíncrona
     const cookieStore = cookies()
     
+    // Creamos el cliente de Supabase después de obtener las cookies
     const supabase = createServerComponentClient({
       cookies: () => cookieStore
     })
 
-    const { data: product, error } = await supabase
+    // Realizamos la consulta a Supabase
+    const { data: products, error } = await supabase
       .from('products')
       .select(`
         *,
@@ -46,43 +35,36 @@ export default async function ProductPage({
           color:colors(*)
         )
       `)
-      .eq('id', productId)
-      .single()
+      .order('created_at', { ascending: false })
 
     if (error) {
       console.error('Supabase error:', error)
       throw error
     }
 
-    if (!product) {
-      notFound()
-    }
-
     return (
       <div className="bg-white">
         <Container>
-          <div className="px-4 py-10 sm:px-6 lg:px-8">
-            <div className="mb-4">
-              <Button variant="outline" asChild>
-                <Link href="/categories">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to categories
-                </Link>
-              </Button>
-            </div>
-            <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
-              <Gallery images={product.images} />
-              <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-                <ProductInfo data={product} />
-              </div>
-            </div>
-            <Separator className="my-10" />
+          <div className="px-4 py-16 sm:px-6 lg:px-8">
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold">Description</h2>
-              <div className="prose max-w-none">
-                {product.description}
-              </div>
+              <h1 className="text-3xl font-bold tracking-tight">All Products</h1>
+              <p className="text-muted-foreground">
+                Browse our complete collection
+              </p>
             </div>
+            {products && products.length > 0 ? (
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {products.map((product: Product) => (
+                  <ProductCard key={product.id} data={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center min-h-[40vh] gap-y-4 mt-8">
+                <p className="text-muted-foreground">
+                  No products found.
+                </p>
+              </div>
+            )}
           </div>
         </Container>
       </div>
@@ -91,18 +73,12 @@ export default async function ProductPage({
     console.error('Error:', error)
     return (
       <Container>
-        <div className="px-4 py-10 sm:px-6 lg:px-8">
+        <div className="px-4 py-16 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-y-4">
             <h1 className="text-2xl font-bold">Something went wrong</h1>
             <p className="text-muted-foreground">
               Please try again later.
             </p>
-            <Button variant="outline" asChild>
-              <Link href="/categories">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to categories
-              </Link>
-            </Button>
           </div>
         </div>
       </Container>

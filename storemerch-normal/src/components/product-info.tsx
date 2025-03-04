@@ -5,7 +5,7 @@ import { ShoppingCart, Heart, Check, AlertCircle } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import { Currency } from "@/components/ui/currency"
-import type { Product } from "@/types"
+import type { Product, Color } from "@/types"
 import { useCart } from "@/hooks/use-cart"
 
 interface ProductInfoProps {
@@ -19,13 +19,18 @@ export function ProductInfo({ data, selectedColorHex, onColorChange }: ProductIn
   const [isAdded, setIsAdded] = useState(false)
   const cart = useCart()
 
-  // Obtener colores únicos del producto
+  // Obtener colores únicos del producto con manejo seguro de tipos
   const uniqueColors = Array.from(new Set(data.images.map((image) => image.color.hex)))
-    .map((hex) => {
+    .map((hex, index) => {
       const image = data.images.find((img) => img.color.hex === hex)
-      return image?.color
+      // Asegurarse de que el color tenga un id, o usar el índice como fallback
+      return {
+        ...image?.color,
+        id: image?.color?.id || `color-${index}`,
+        hex,
+        name: image?.color?.name || `Color ${index + 1}`
+      }
     })
-    .filter((color): color is NonNullable<typeof color> => color !== undefined)
 
   console.log("Unique colors:", uniqueColors) // Para depuración
   console.log("Selected color:", selectedColorHex) // Para depuración
@@ -57,6 +62,13 @@ export function ProductInfo({ data, selectedColorHex, onColorChange }: ProductIn
     setIsAdded(true)
   }
 
+  // Verificamos si category es un objeto o un string
+  const categoryName = typeof data.category === 'object' && data.category 
+    ? data.category.name 
+    : typeof data.category === 'string' 
+      ? data.category 
+      : 'Uncategorized'
+
   return (
     <div className="space-y-6 bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm">
       <div className="space-y-2">
@@ -74,7 +86,7 @@ export function ProductInfo({ data, selectedColorHex, onColorChange }: ProductIn
       <div className="space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-x-4">
           <h3 className="font-medium text-gray-700 min-w-24">Category:</h3>
-          <div className="text-gray-600 bg-gray-100 px-3 py-1 rounded-md">{data?.category?.name}</div>
+          <div className="text-gray-600 bg-gray-100 px-3 py-1 rounded-md">{categoryName}</div>
         </div>
 
         <div className="space-y-4">

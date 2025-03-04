@@ -24,14 +24,14 @@ export interface ProductImage {
 
 export interface Product {
   id: string
-  category: string
   name: string
-  price: string
+  price: number | string;
   isFeatured: boolean
   size: string
   color: string
   images: ProductImage[]
   description: string
+  category?: Category | string;
   stock: number
 }
 

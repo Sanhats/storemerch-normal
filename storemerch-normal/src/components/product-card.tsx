@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Expand, ShoppingCart } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
-import type { Product } from "@/types"
+import type { Product, Category } from "@/types"
 
 interface ProductCardProps {
   data: Product
@@ -20,6 +20,18 @@ export function ProductCard({ data }: ProductCardProps) {
     event.preventDefault()
     // TODO: Implementar funcionalidad del carrito
   }
+
+  // Verificamos si category es un objeto o un string
+  const categoryName = typeof data.category === 'object' && data.category 
+    ? data.category.name 
+    : typeof data.category === 'string' 
+      ? data.category 
+      : 'Uncategorized'
+
+  // Formateamos el precio correctamente
+  const formattedPrice = typeof data.price === 'number'
+    ? data.price.toFixed(2)
+    : data.price
 
   return (
     <Link 
@@ -54,11 +66,11 @@ export function ProductCard({ data }: ProductCardProps) {
       </div>
       <div className="px-4">
         <p className="font-semibold text-lg">{data.name}</p>
-        <p className="text-sm text-gray-500">{data.category?.name}</p>
+        <p className="text-sm text-gray-500">{categoryName}</p>
       </div>
       <div className="px-4 pb-4">
         <div className="font-semibold">
-          ${data.price.toFixed(2)}
+          ${formattedPrice}
         </div>
       </div>
     </Link>
