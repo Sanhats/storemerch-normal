@@ -1,7 +1,7 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft } from 'lucide-react'
 import { notFound } from "next/navigation"
 
 import { Container } from "@/components/ui/container"
@@ -9,15 +9,29 @@ import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { ProductColorDisplay } from "./product-color-display"
 
-interface PageProps {
-  params: {
-    productId: string
-  }
+// Actualizado el tipo PageProps para Next.js 15
+type PageProps = {
+  params: Promise<{
+    productId: string;
+  }>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function ProductPage({ params }: PageProps) {
+export default async function ProductPage({
+  params,
+  searchParams,
+}: PageProps) {
   try {
-    const cookieStore = await cookies()
+    // Esperamos a que se resuelvan los parámetros
+    const resolvedParams = await params
+    const productId = resolvedParams.productId
+
+    if (!productId) {
+      return notFound()
+    }
+
+    // Obtenemos las cookies de forma asíncrona
+    const cookieStore = cookies()
 
     const supabase = createServerComponentClient({
       cookies: () => cookieStore,
@@ -33,7 +47,7 @@ export default async function ProductPage({ params }: PageProps) {
           color:colors(*)
         )
       `)
-      .eq("id", await params.productId)
+      .eq("id", productId)
       .single()
 
     if (error) {
@@ -101,4 +115,3 @@ export default async function ProductPage({ params }: PageProps) {
     )
   }
 }
-
