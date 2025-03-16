@@ -123,7 +123,7 @@ export function Gallery({ images = [], selectedColor }: GalleryProps) {
               {isZoomed && (
                 <div className="absolute bottom-4 left-4 bg-white/90 rounded-full p-2 flex items-center gap-2">
                   <Move size={20} />
-                  <span className="text-sm font-medium">Move to zoom</span>
+                  <span className="text-sm font-medium">Zoom</span>
                 </div>
               )}
               {/* Color indicator for main image */}

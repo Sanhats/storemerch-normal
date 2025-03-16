@@ -1,5 +1,6 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
+import Image from "next/image"
 
 import { ProductList } from "@/components/product-list"
 import type { Product } from "@/types"
@@ -21,13 +22,22 @@ export default async function Home() {
   return (
     <div className="space-y-10 pb-10">
       <div className="p-4 sm:p-6 lg:p-8 rounded-lg overflow-hidden">
-        <div className="rounded-lg relative aspect-square md:aspect-[2.4/1] overflow-hidden bg-cover">
+        {/* Cambiamos el fondo a los colores del logo TIENDITA */}
+        <div className="rounded-lg relative aspect-square md:aspect-[2.4/1] overflow-hidden bg-gradient-to-r from-[#457b9d] to-[#3aaae3]">
           <div className="h-full w-full flex flex-col justify-center items-center text-center gap-y-8">
-            <div className="font-bold text-3xl sm:text-5xl lg:text-6xl sm:max-w-xl max-w-xs">
-              Featured Products
-              <hr className="my-4" />
-              <div className="text-base sm:text-xl">
-                Check out our featured collection
+            {/* Añadimos el logo */}
+            <div className="mb-4">
+              <Image 
+                src="/assets/tiendita.png" 
+                alt="Logo Tiendita" 
+                width={400} 
+                height={200} 
+                className="drop-shadow-xl"
+              />
+            </div>
+            <div className="font-bold text-3xl sm:text-5xl lg:text-6xl sm:max-w-xl max-w-xs text-white">
+              <div className="text-base sm:text-xl mt-2">
+               Encontrá aquí tu merch normalina
               </div>
             </div>
           </div>

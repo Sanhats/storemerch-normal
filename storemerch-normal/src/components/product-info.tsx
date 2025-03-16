@@ -85,7 +85,7 @@ export function ProductInfo({ data, selectedColorHex, onColorChange }: ProductIn
       
       <div className="space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-x-4">
-          <h3 className="font-medium text-gray-700 min-w-24">Category:</h3>
+          <h3 className="font-medium text-gray-700 min-w-24">Categoria:</h3>
           <div className="text-gray-600 bg-gray-100 px-3 py-1 rounded-md">{categoryName}</div>
         </div>
 
@@ -148,7 +148,7 @@ export function ProductInfo({ data, selectedColorHex, onColorChange }: ProductIn
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-x-4">
-          <h3 className="font-medium text-gray-700 min-w-24">Quantity:</h3>
+          <h3 className="font-medium text-gray-700 min-w-24">Cantidad:</h3>
           <div className="flex items-center gap-x-3 bg-gray-50 p-1.5 rounded-lg border border-gray-200 w-fit">
             <Button
               variant="outline"
@@ -191,12 +191,12 @@ export function ProductInfo({ data, selectedColorHex, onColorChange }: ProductIn
             {isAdded ? (
               <>
                 <Check className="h-5 w-5 mr-1 animate-bounce" />
-                Added to Cart
+                Añadido
               </>
             ) : (
               <>
                 <ShoppingCart className="h-5 w-5 mr-1" />
-                Add To Cart
+                Añadir al carrito
               </>
             )}
           </Button>
@@ -207,14 +207,14 @@ export function ProductInfo({ data, selectedColorHex, onColorChange }: ProductIn
         {!selectedColorHex && (
           <div className="p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-600 flex items-center animate-pulse">
             <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-            <p>Please select a color before adding to cart</p>
+            <p>Por favor elige un color antes de añadir al carrito</p>
           </div>
         )}
         
         {data.stock === 0 && (
           <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg text-sm text-amber-600 flex items-center">
             <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-            <p>This product is currently out of stock. Please check back later.</p>
+            <p>Sin stock.</p>
           </div>
         )}
       </div>

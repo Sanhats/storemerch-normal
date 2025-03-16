@@ -17,6 +17,7 @@ export interface ProductImage {
   id: string
   url: string
   color?: {
+    id: string;
     name: string
     hex: string
   }
