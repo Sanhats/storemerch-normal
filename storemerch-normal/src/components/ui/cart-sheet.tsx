@@ -1,6 +1,7 @@
 "use client"
 
-import { ShoppingCart, MessageCircle } from 'lucide-react'
+import { useState } from "react"
+import { ShoppingCart, MessageCircle, AlertCircle } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -11,6 +12,9 @@ import { formatPrice } from "@/lib/utils"
 
 export function CartSheet() {
   const cart = useCart()
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const totalPrice = cart.items.reduce((total, item) => {
     return total + Number(item.price) * item.quantity
@@ -19,20 +23,50 @@ export function CartSheet() {
   const formattedTotalPrice = formatPrice(totalPrice)
 
   const handleWhatsAppCheckout = () => {
-    const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
-    if (!phoneNumber) return
+    try {
+      setIsProcessing(true)
+      setErrorMessage(null)
+      setSuccessMessage(null)
+      
+      // Obtener el número de WhatsApp de las variables de entorno
+      const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
+      
+      // Si no hay número configurado, mostrar un error
+      if (!phoneNumber) {
+        setErrorMessage("No se ha configurado un número de WhatsApp para realizar la compra. Por favor, contacta al administrador.")
+        return
+      }
 
-    const items = cart.items
-      .map((item) => {
-        return `• ${item.name} (${item.selectedColorName}) x${item.quantity} - ${formatPrice(Number(item.price) * item.quantity)}`
-      })
-      .join("\n")
+      // Formatear los items del carrito para el mensaje
+      const items = cart.items
+        .map((item) => {
+          return `• ${item.name} (${item.selectedColorName || 'Color estándar'}) x${item.quantity} - ${formatPrice(Number(item.price) * item.quantity)}`
+        })
+        .join("\n")
 
-    const message = `🛍️ *Nuevo Pedido*\n\n*Productos:*\n${items}\n\n*Total:* ${formattedTotalPrice}`
+      // Crear el mensaje completo
+      const message = `🛍️ *Nuevo Pedido*\n\n*Productos:*\n${items}\n\n*Total:* ${formattedTotalPrice}`
 
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, "_blank")
+      // Crear la URL de WhatsApp
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+      
+      // Abrir WhatsApp en una nueva pestaña
+      window.open(whatsappUrl, "_blank")
+      
+      // Opcional: limpiar el carrito después de enviar el pedido
+      // cart.removeAll()
+      
+      setSuccessMessage("¡Pedido enviado! Te redirigimos a WhatsApp para finalizar tu compra.")
+    } catch (error) {
+      console.error("Error al procesar la compra:", error)
+      setErrorMessage("Ocurrió un error al procesar tu compra. Por favor, inténtalo de nuevo.")
+    } finally {
+      setIsProcessing(false)
+    }
   }
+
+  // Verificar si el número de WhatsApp está configurado
+  const isWhatsAppConfigured = !!process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
 
   return (
     <Sheet>
@@ -87,12 +121,43 @@ export function CartSheet() {
                 </div>
               </div>
               
+              {/* Mensajes de error y éxito */}
+              {errorMessage && (
+                <div className="mb-4 p-3 border border-red-200 rounded-lg bg-red-50 flex items-start gap-2">
+                  <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700">{errorMessage}</p>
+                </div>
+              )}
+              
+              {successMessage && (
+                <div className="mb-4 p-3 border border-green-200 rounded-lg bg-green-50 flex items-start gap-2">
+                  <MessageCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-green-700">{successMessage}</p>
+                </div>
+              )}
+              
+              {!isWhatsAppConfigured && (
+                <div className="mb-4 p-3 border border-red-200 rounded-lg bg-red-50 flex items-start gap-2">
+                  <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700">
+                    No se ha configurado un número de WhatsApp. Por favor, agrega la variable de entorno NEXT_PUBLIC_WHATSAPP_NUMBER.
+                  </p>
+                </div>
+              )}
+              
               <Button 
                 className="w-full bg-blue-700 hover:bg-blue-800 flex items-center justify-center gap-2" 
                 onClick={handleWhatsAppCheckout}
+                disabled={isProcessing || !isWhatsAppConfigured || cart.items.length === 0}
               >
-                Terminar compra por WhatsApp
-                <MessageCircle className="h-5 w-5" />
+                {isProcessing ? (
+                  <>Procesando...</>
+                ) : (
+                  <>
+                    Terminar compra por WhatsApp
+                    <MessageCircle className="h-5 w-5" />
+                  </>
+                )}
               </Button>
             </div>
           </>
