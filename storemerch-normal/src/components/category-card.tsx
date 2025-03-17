@@ -34,7 +34,7 @@ export function CategoryCard({ category, productCount = 0 }: CategoryCardProps) 
         </div>
       </div>
       <div className="px-6 py-4 bg-gray-50 flex items-center justify-between group-hover:bg-primary/5 transition-colors duration-300">
-        <span className="text-sm font-medium text-primary">Explore category</span>
+        <span className="text-sm font-medium text-primary">Ver categorias</span>
         <ArrowRight className="h-5 w-5 text-primary transform group-hover:translate-x-1 transition-transform duration-300" />
       </div>
     </div>

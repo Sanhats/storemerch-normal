@@ -29,7 +29,7 @@ export function CartItem({ data }: CartItemProps) {
           <div>
             <h4 className="text-sm font-semibold">{data.name}</h4>
             <p className="text-xs text-muted-foreground">Color: {data.selectedColorName}</p>
-            <p className="text-xs text-muted-foreground">Quantity: {data.quantity}</p>
+            <p className="text-xs text-muted-foreground">Cantidad: {data.quantity}</p>
           </div>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
             <X className="h-4 w-4" />
